@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Split Test Files for This Container
           command: |
-            cat all_tests.txt | circleci tests split --split-by=filename > to_run.txt
+            cat all_tests.txt | circleci tests split --split-by=filesize > to_run.txt
       - run:
           name: Run Test Files in This Container
           command: |
