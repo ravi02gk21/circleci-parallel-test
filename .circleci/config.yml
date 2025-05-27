@@ -1,0 +1,40 @@
+version: 2.1
+
+jobs:
+  run-tests:
+    docker:
+      - image: cimg/python:3.10
+    parallelism: 2
+    steps:
+      - checkout
+      - run:
+          name: Create Dummy Tests (again, for demo)
+          command: |
+            mkdir -p tests
+            echo "print('Running test 1')" > tests/test1.py
+            echo "print('Running test 2')" > tests/test2.py
+            echo "print('Running test 3')" > tests/test3.py
+            echo "print('Running test 4')" > tests/test4.py
+      - run:
+          name: List All Test Files
+          command: |
+            find tests -name "*.py" > all_tests.txt
+      - run:
+          name: Split Test Files for This Container
+          command: |
+            cat all_tests.txt | circleci tests split --split-by=filename > to_run.txt
+      - run:
+          name: Run Test Files in This Container
+          command: |
+            echo "🔹 This is container $CIRCLE_NODE_INDEX out of $CIRCLE_NODE_TOTAL"
+            while read test_file; do
+              echo "▶ Running $test_file"
+              python $test_file
+            done < to_run.txt
+
+workflows:
+  version: 2
+  test-flow:
+    jobs:
+      - run-tests
+
